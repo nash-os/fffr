@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Vision X-Tract</title>
+<title>OmniCoder Agent</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 :root{
---bg:#0b0b0b;
---surface:#141414;
---surface2:#1b1b1b;
+--bg:#090909;
+--surface:#121212;
+--surface2:#171717;
+--surface3:#1d1d1d;
 --border:rgba(255,255,255,.08);
 --accent:#00e887;
---text:#ededed;
---muted:#777;
+--text:#ececec;
+--muted:#737373;
 --mono:'Geist Mono',monospace;
 --ui:'Geist',sans-serif
 }
@@ -30,21 +31,21 @@ box-sizing:border-box
 body{
 height:100vh;
 overflow:hidden;
-display:flex;
-flex-direction:column;
 background:var(--bg);
+font-family:var(--ui);
 color:var(--text);
-font-family:var(--ui)
+display:flex;
+flex-direction:column
 }
 
 nav{
-height:56px;
+height:60px;
+background:var(--surface);
+border-bottom:1px solid var(--border);
 display:flex;
 align-items:center;
 justify-content:space-between;
-padding:0 18px;
-background:var(--surface);
-border-bottom:1px solid var(--border)
+padding:0 18px
 }
 
 .logo{
@@ -58,17 +59,22 @@ text-transform:uppercase
 color:var(--accent)
 }
 
-.actions{
+.top-actions{
 display:flex;
+align-items:center;
 gap:10px
 }
 
-button{
-height:36px;
-padding:0 16px;
+button,select{
+height:38px;
 border:none;
-border-radius:10px;
-font-weight:600;
+outline:none;
+border-radius:12px
+}
+
+button{
+padding:0 16px;
+font-weight:700;
 cursor:pointer
 }
 
@@ -83,28 +89,129 @@ border:1px solid var(--border);
 color:var(--text)
 }
 
+select{
+background:var(--surface2);
+border:1px solid var(--border);
+padding:0 12px;
+color:var(--text)
+}
+
 .workspace{
 flex:1;
 display:grid;
-grid-template-columns:420px 1fr 420px
+grid-template-columns:320px 1fr 520px;
+overflow:hidden
 }
 
-.panel{
+.sidebar{
+background:var(--surface);
+border-right:1px solid var(--border);
 display:flex;
-flex-direction:column;
-border-right:1px solid var(--border)
+flex-direction:column
 }
 
-.panel:last-child{
-border-right:none
-}
-
-.header{
-height:42px;
+.sidebar-header{
+height:44px;
 display:flex;
 align-items:center;
 padding:0 14px;
+font-size:11px;
+font-weight:700;
+letter-spacing:.1em;
+text-transform:uppercase;
+color:var(--muted);
+border-bottom:1px solid var(--border)
+}
+
+.sidebar-body{
+padding:14px;
+display:flex;
+flex-direction:column;
+gap:12px;
+overflow:auto
+}
+
+textarea{
+width:100%;
+resize:none;
+outline:none;
+border:none;
+background:var(--surface2);
+border:1px solid var(--border);
+border-radius:14px;
+padding:14px;
+font-family:var(--mono);
+font-size:12px;
+line-height:1.7;
+color:var(--text)
+}
+
+#system{
+height:220px
+}
+
+.chat{
+display:flex;
+flex-direction:column;
+overflow:hidden
+}
+
+.messages{
+flex:1;
+overflow:auto;
+padding:18px;
+display:flex;
+flex-direction:column;
+gap:16px
+}
+
+.msg{
+max-width:900px;
+padding:16px;
+border-radius:16px;
+line-height:1.7;
+font-size:14px;
+white-space:pre-wrap
+}
+
+.user{
+align-self:flex-end;
+background:#1d1d1d;
+border:1px solid var(--border)
+}
+
+.assistant{
+align-self:flex-start;
+background:#101010;
+border:1px solid rgba(0,232,135,.18)
+}
+
+.composer{
+padding:14px;
+display:flex;
+gap:12px;
+border-top:1px solid var(--border);
+background:var(--surface)
+}
+
+#input{
+height:80px;
+flex:1
+}
+
+.output{
 background:var(--surface);
+border-left:1px solid var(--border);
+display:flex;
+flex-direction:column
+}
+
+.output-header{
+height:44px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 14px;
 border-bottom:1px solid var(--border);
 font-size:11px;
 font-weight:700;
@@ -113,96 +220,17 @@ text-transform:uppercase;
 color:var(--muted)
 }
 
-.body{
+#code{
 flex:1;
-padding:12px;
-overflow:auto;
-position:relative
-}
-
-#drop{
-height:100%;
-border:2px dashed rgba(255,255,255,.12);
-border-radius:16px;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-gap:12px;
-cursor:pointer;
-transition:.2s;
-position:relative
-}
-
-#drop:hover{
-border-color:var(--accent);
-background:rgba(0,232,135,.04)
-}
-
-#preview{
-position:absolute;
-inset:0;
-width:100%;
-height:100%;
-object-fit:contain;
-padding:10px;
-display:none
-}
-
-.drop-text{
-font-size:13px;
-color:var(--muted);
-text-align:center;
-line-height:1.6
-}
-
-textarea{
-width:100%;
-height:100%;
-resize:none;
+border:none;
 outline:none;
-border-radius:14px;
-border:1px solid var(--border);
-background:#101010;
-padding:14px;
+background:#0f0f0f;
+padding:16px;
 font-family:var(--mono);
 font-size:12px;
 line-height:1.7;
-color:#dcdcdc
-}
-
-iframe{
-width:100%;
-height:100%;
-border:none;
-border-radius:14px;
-background:#fff
-}
-
-#loader{
-position:absolute;
-inset:0;
-display:none;
-align-items:center;
-justify-content:center;
-background:rgba(0,0,0,.72);
-backdrop-filter:blur(5px);
-z-index:100
-}
-
-.spinner{
-width:44px;
-height:44px;
-border-radius:50%;
-border:3px solid rgba(255,255,255,.1);
-border-top-color:var(--accent);
-animation:spin .7s linear infinite
-}
-
-@keyframes spin{
-to{
-transform:rotate(360deg)
-}
+color:#dcdcdc;
+resize:none
 }
 
 .status{
@@ -217,29 +245,12 @@ font-family:var(--mono);
 color:var(--muted)
 }
 
-.toast{
-position:fixed;
-left:50%;
-bottom:30px;
-transform:translateX(-50%);
-background:#1a1a1a;
-border:1px solid var(--border);
-padding:10px 14px;
-border-radius:12px;
-font-size:12px;
-opacity:0;
-pointer-events:none;
-transition:.2s;
-z-index:300
-}
-
-.toast.show{
-opacity:1
-}
-
 @media(max-width:1200px){
 .workspace{
 grid-template-columns:1fr
+}
+.sidebar,.output{
+display:none
 }
 }
 </style>
@@ -250,21 +261,24 @@ grid-template-columns:1fr
 <nav>
 
 <div class="logo">
-VISION <span>X-TRACT</span>
+OMNICODER <span>AGENT</span>
 </div>
 
-<div class="actions">
+<div class="top-actions">
 
-<button class="ghost" id="renderBtn">
-Render
-</button>
+<select id="model">
+<option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3</option>
+<option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B</option>
+<option value="qwen/qwen2.5-coder-32b-instruct:free">Qwen Coder</option>
+<option value="google/gemma-2-9b-it:free">Gemma 2</option>
+</select>
 
-<button class="ghost" id="clearBtn">
+<button class="ghost" id="clear">
 Limpiar
 </button>
 
-<button class="primary" id="analyzeBtn">
-Analizar Imagen
+<button class="primary" id="send">
+Enviar
 </button>
 
 </div>
@@ -273,68 +287,55 @@ Analizar Imagen
 
 <div class="workspace">
 
-<div class="panel">
+<div class="sidebar">
 
-<div class="header">
-Imagen
+<div class="sidebar-header">
+System Prompt
 </div>
 
-<div class="body">
+<div class="sidebar-body">
 
-<div id="drop">
+<textarea id="system">
+You are OmniCoder, an elite autonomous coding agent.
 
-<img id="preview">
-
-<div class="drop-text">
-<strong>Arrastra una imagen</strong><br>
-PNG · JPG · WEBP
-</div>
-
-<input
-type="file"
-id="file"
-hidden
-accept="image/*"
->
-
-</div>
-
-</div>
-
-</div>
-
-<div class="panel">
-
-<div class="header">
-Código generado
-</div>
-
-<div class="body">
-
-<div id="loader">
-<div class="spinner"></div>
-</div>
-
-<textarea
-id="code"
-placeholder="// El HTML generado aparecerá aquí"
-></textarea>
+Rules:
+- Produce production-grade code.
+- Always optimize architecture.
+- Use modern syntax.
+- Generate complete files.
+- Never explain unless requested.
+- Prefer scalable patterns.
+- Use advanced UI/UX.
+- Generate responsive layouts.
+- Include animations when useful.
+- Write secure code.
+- Minimize redundancy.
+- Generate high fidelity interfaces.
+</textarea>
 
 </div>
 
 </div>
 
-<div class="panel">
+<div class="chat">
 
-<div class="header">
-Vista previa
-</div>
+<div class="messages" id="messages"></div>
 
-<div class="body">
+<div class="composer">
 
-<iframe id="frame"></iframe>
+<textarea id="input" placeholder="Escribe una tarea de programación..."></textarea>
 
 </div>
+
+</div>
+
+<div class="output">
+
+<div class="output-header">
+Generated Code
+</div>
+
+<textarea id="code"></textarea>
 
 </div>
 
@@ -344,137 +345,71 @@ Vista previa
 Idle
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-const OPENROUTER_API_KEY="TU_API_KEY_AQUI"
-
-let imageBase64=null
-let imageMime=null
+const OPENROUTER_API_KEY="sk-or-v1-TU_API_KEY"
 
 const $=e=>document.querySelector(e)
 
-const file=$("#file")
-const drop=$("#drop")
-const preview=$("#preview")
+const messages=$("#messages")
+const input=$("#input")
+const send=$("#send")
 const code=$("#code")
-const frame=$("#frame")
-const loader=$("#loader")
 const statusEl=$("#status")
-const toast=$("#toast")
+const system=$("#system")
+const model=$("#model")
 
-function showToast(msg){
+let history=[]
 
-toast.textContent=msg
+function status(t){
 
-toast.classList.add("show")
-
-setTimeout(()=>{
-toast.classList.remove("show")
-},2500)
+statusEl.textContent=t
 
 }
 
-function setStatus(msg){
+function add(role,text){
 
-statusEl.textContent=msg
+const div=document.createElement("div")
 
-}
+div.className=`msg ${role}`
 
-function loadImage(f){
+div.textContent=text
 
-if(!f.type.startsWith("image/")){
+messages.appendChild(div)
 
-showToast("Archivo inválido")
-
-return
+messages.scrollTop=messages.scrollHeight
 
 }
 
-const reader=new FileReader()
+function extractCode(t){
 
-reader.onload=e=>{
+const match=t.match(/```(?:\w+)?\n([\s\S]*?)```/)
 
-preview.src=e.target.result
+if(match)return match[1]
 
-preview.style.display="block"
-
-imageBase64=e.target.result.split(",")[1]
-
-imageMime=f.type
-
-setStatus(`Imagen cargada · ${(f.size/1024).toFixed(0)} KB`)
+return t
 
 }
 
-reader.readAsDataURL(f)
+async function ask(){
 
-}
+const text=input.value.trim()
 
-drop.onclick=()=>file.click()
+if(!text)return
 
-file.onchange=e=>{
+add("user",text)
 
-if(e.target.files[0]){
-
-loadImage(e.target.files[0])
-
-}
-
-}
-
-drop.addEventListener("dragover",e=>{
-
-e.preventDefault()
-
-drop.style.borderColor="#00e887"
-
+history.push({
+role:"user",
+content:text
 })
 
-drop.addEventListener("dragleave",()=>{
+input.value=""
 
-drop.style.borderColor=""
+send.disabled=true
 
-})
-
-drop.addEventListener("drop",e=>{
-
-e.preventDefault()
-
-drop.style.borderColor=""
-
-const f=e.dataTransfer.files[0]
-
-if(f){
-
-loadImage(f)
-
-}
-
-})
-
-async function analyze(){
-
-if(!imageBase64){
-
-showToast("Carga una imagen")
-
-return
-
-}
-
-loader.style.display="flex"
-
-setStatus("Analizando imagen...")
+status("Generating...")
 
 try{
-
-const prompt=`
-Analiza esta imagen y genera un HTML visualmente fiel.
-Devuelve SOLO código HTML y CSS.
-Sin markdown.
-Sin explicaciones.
-`
 
 const res=await fetch(
 "https://openrouter.ai/api/v1/chat/completions",
@@ -485,34 +420,26 @@ headers:{
 "Content-Type":"application/json",
 "Authorization":"Bearer "+OPENROUTER_API_KEY,
 "HTTP-Referer":location.href,
-"X-Title":"Vision X-Tract"
+"X-Title":"OmniCoder Agent"
 },
 
 body:JSON.stringify({
 
-model:"qwen/qwen2.5-vl-72b-instruct:free",
+model:model.value,
 
-messages:[{
-
-role:"user",
-
-content:[
+messages:[
 
 {
-type:"text",
-text:prompt
+role:"system",
+content:system.value
 },
 
-{
-type:"image_url",
-image_url:{
-url:`data:${imageMime};base64,${imageBase64}`
-}
-}
+...history
 
-]
+],
 
-}]
+temperature:.7,
+max_tokens:8192
 
 })
 
@@ -521,83 +448,66 @@ url:`data:${imageMime};base64,${imageBase64}`
 
 if(!res.ok){
 
-const err=await res.text()
-
-throw new Error(err)
+throw new Error(await res.text())
 
 }
 
 const data=await res.json()
 
-let output=data.choices?.[0]?.message?.content||""
+const out=data.choices?.[0]?.message?.content||"No response"
 
-output=output
-.replace(/^```html/gm,"")
-.replace(/^```/gm,"")
-.replace(/```$/gm,"")
-.trim()
+add("assistant",out)
 
-code.value=output
+history.push({
+role:"assistant",
+content:out
+})
 
-render()
+code.value=extractCode(out)
 
-showToast("Código generado")
-
-setStatus("Completado")
+status("Done")
 
 }catch(err){
 
 console.error(err)
 
-showToast("Error API")
+add("assistant","ERROR:\n"+err.message)
 
-setStatus("Error")
+status("Error")
 
 }finally{
 
-loader.style.display="none"
+send.disabled=false
 
 }
 
 }
 
-function render(){
+send.onclick=ask
 
-const html=code.value.trim()
+input.addEventListener("keydown",e=>{
 
-if(!html)return
+if(e.key==="Enter"&&!e.shiftKey){
 
-frame.srcdoc=html
+e.preventDefault()
+
+ask()
 
 }
 
-$("#analyzeBtn").onclick=analyze
+})
 
-$("#renderBtn").onclick=render
+$("#clear").onclick=()=>{
 
-$("#clearBtn").onclick=()=>{
+history=[]
 
-imageBase64=null
-imageMime=null
-
-preview.src=""
-preview.style.display="none"
+messages.innerHTML=""
 
 code.value=""
 
-frame.srcdoc=""
-
-setStatus("Idle")
-
-showToast("Limpiado")
+status("Cleared")
 
 }
-
-code.addEventListener("input",()=>{
-
-render()
-
-})
 </script>
 
 </body>
