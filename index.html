@@ -10,12 +10,12 @@
 
 <style>
 :root{
---bg:#0c0c0c;
---surface:#121212;
---surface2:#191919;
+--bg:#0b0b0b;
+--surface:#141414;
+--surface2:#1b1b1b;
 --border:rgba(255,255,255,.08);
 --accent:#00e887;
---text:#ececec;
+--text:#ededed;
 --muted:#777;
 --mono:'Geist Mono',monospace;
 --ui:'Geist',sans-serif
@@ -28,13 +28,13 @@ box-sizing:border-box
 }
 
 body{
-background:var(--bg);
-color:var(--text);
-font-family:var(--ui);
 height:100vh;
+overflow:hidden;
 display:flex;
 flex-direction:column;
-overflow:hidden
+background:var(--bg);
+color:var(--text);
+font-family:var(--ui)
 }
 
 nav{
@@ -50,7 +50,7 @@ border-bottom:1px solid var(--border)
 .logo{
 font-size:13px;
 font-weight:700;
-letter-spacing:.12em;
+letter-spacing:.14em;
 text-transform:uppercase
 }
 
@@ -58,31 +58,16 @@ text-transform:uppercase
 color:var(--accent)
 }
 
-.controls{
+.actions{
 display:flex;
-align-items:center;
 gap:10px
 }
 
-button,input{
-height:36px;
-border:none;
-outline:none;
-border-radius:10px
-}
-
-input{
-width:320px;
-padding:0 12px;
-background:var(--surface2);
-border:1px solid var(--border);
-color:var(--text);
-font-family:var(--mono);
-font-size:12px
-}
-
 button{
+height:36px;
 padding:0 16px;
+border:none;
+border-radius:10px;
 font-weight:600;
 cursor:pointer
 }
@@ -101,8 +86,7 @@ color:var(--text)
 .workspace{
 flex:1;
 display:grid;
-grid-template-columns:420px 1fr;
-overflow:hidden
+grid-template-columns:420px 1fr 420px
 }
 
 .panel{
@@ -161,7 +145,7 @@ inset:0;
 width:100%;
 height:100%;
 object-fit:contain;
-padding:12px;
+padding:10px;
 display:none
 }
 
@@ -184,7 +168,15 @@ padding:14px;
 font-family:var(--mono);
 font-size:12px;
 line-height:1.7;
-color:#d9d9d9
+color:#dcdcdc
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
+border-radius:14px;
+background:#fff
 }
 
 #loader{
@@ -193,14 +185,14 @@ inset:0;
 display:none;
 align-items:center;
 justify-content:center;
-background:rgba(0,0,0,.75);
-backdrop-filter:blur(4px);
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(5px);
 z-index:100
 }
 
 .spinner{
-width:42px;
-height:42px;
+width:44px;
+height:44px;
 border-radius:50%;
 border:3px solid rgba(255,255,255,.1);
 border-top-color:var(--accent);
@@ -228,9 +220,9 @@ color:var(--muted)
 .toast{
 position:fixed;
 left:50%;
-bottom:28px;
+bottom:30px;
 transform:translateX(-50%);
-background:#1b1b1b;
+background:#1a1a1a;
 border:1px solid var(--border);
 padding:10px 14px;
 border-radius:12px;
@@ -238,14 +230,14 @@ font-size:12px;
 opacity:0;
 pointer-events:none;
 transition:.2s;
-z-index:200
+z-index:300
 }
 
 .toast.show{
 opacity:1
 }
 
-@media(max-width:1000px){
+@media(max-width:1200px){
 .workspace{
 grid-template-columns:1fr
 }
@@ -261,20 +253,18 @@ grid-template-columns:1fr
 VISION <span>X-TRACT</span>
 </div>
 
-<div class="controls">
+<div class="actions">
 
-<input
-id="apikey"
-type="password"
-placeholder="Pega aquí tu OpenRouter API Key"
->
+<button class="ghost" id="renderBtn">
+Render
+</button>
 
 <button class="ghost" id="clearBtn">
 Limpiar
 </button>
 
 <button class="primary" id="analyzeBtn">
-Analizar
+Analizar Imagen
 </button>
 
 </div>
@@ -316,7 +306,7 @@ accept="image/*"
 <div class="panel">
 
 <div class="header">
-Código HTML generado
+Código generado
 </div>
 
 <div class="body">
@@ -334,6 +324,20 @@ placeholder="// El HTML generado aparecerá aquí"
 
 </div>
 
+<div class="panel">
+
+<div class="header">
+Vista previa
+</div>
+
+<div class="body">
+
+<iframe id="frame"></iframe>
+
+</div>
+
+</div>
+
 </div>
 
 <div class="status" id="status">
@@ -343,18 +347,21 @@ Idle
 <div class="toast" id="toast"></div>
 
 <script>
+const OPENROUTER_API_KEY="TU_API_KEY_AQUI"
+
 let imageBase64=null
 let imageMime=null
 
 const $=e=>document.querySelector(e)
 
-const drop=$("#drop")
 const file=$("#file")
+const drop=$("#drop")
 const preview=$("#preview")
 const code=$("#code")
+const frame=$("#frame")
+const loader=$("#loader")
 const statusEl=$("#status")
 const toast=$("#toast")
-const loader=$("#loader")
 
 function showToast(msg){
 
@@ -384,9 +391,9 @@ return
 
 }
 
-const r=new FileReader()
+const reader=new FileReader()
 
-r.onload=e=>{
+reader.onload=e=>{
 
 preview.src=e.target.result
 
@@ -400,7 +407,7 @@ setStatus(`Imagen cargada · ${(f.size/1024).toFixed(0)} KB`)
 
 }
 
-r.readAsDataURL(f)
+reader.readAsDataURL(f)
 
 }
 
@@ -456,31 +463,27 @@ return
 
 }
 
-const apiKey=$("#apikey").value.trim()
-
-if(!apiKey){
-
-showToast("Introduce tu API key")
-
-return
-
-}
-
 loader.style.display="flex"
 
-setStatus("Procesando imagen...")
+setStatus("Analizando imagen...")
 
 try{
 
-const prompt=`Analiza esta imagen y devuelve únicamente HTML y CSS altamente fiel visualmente. No uses markdown. No expliques nada.`
+const prompt=`
+Analiza esta imagen y genera un HTML visualmente fiel.
+Devuelve SOLO código HTML y CSS.
+Sin markdown.
+Sin explicaciones.
+`
 
-const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
-
+const res=await fetch(
+"https://openrouter.ai/api/v1/chat/completions",
+{
 method:"POST",
 
 headers:{
 "Content-Type":"application/json",
-"Authorization":"Bearer "+apiKey,
+"Authorization":"Bearer "+OPENROUTER_API_KEY,
 "HTTP-Referer":location.href,
 "X-Title":"Vision X-Tract"
 },
@@ -513,7 +516,8 @@ url:`data:${imageMime};base64,${imageBase64}`
 
 })
 
-})
+}
+)
 
 if(!res.ok){
 
@@ -535,6 +539,8 @@ output=output
 
 code.value=output
 
+render()
+
 showToast("Código generado")
 
 setStatus("Completado")
@@ -555,19 +561,31 @@ loader.style.display="none"
 
 }
 
+function render(){
+
+const html=code.value.trim()
+
+if(!html)return
+
+frame.srcdoc=html
+
+}
+
 $("#analyzeBtn").onclick=analyze
+
+$("#renderBtn").onclick=render
 
 $("#clearBtn").onclick=()=>{
 
 imageBase64=null
-
 imageMime=null
 
 preview.src=""
-
 preview.style.display="none"
 
 code.value=""
+
+frame.srcdoc=""
 
 setStatus("Idle")
 
@@ -575,6 +593,11 @@ showToast("Limpiado")
 
 }
 
+code.addEventListener("input",()=>{
+
+render()
+
+})
 </script>
 
 </body>
