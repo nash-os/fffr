@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vision X-Tract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0c0c0c;
+--surface:#111;
+--surface-2:#161616;
+--surface-3:#1c1c1c;
+--border:rgba(255,255,255,.07);
+--border-hi:rgba(255,255,255,.13);
+--accent:#00e887;
+--accent-dim:rgba(0,232,135,.12);
+--accent-glow:rgba(0,232,135,.25);
+--text:#e2e2e2;
+--text-muted:#6b6b6b;
+--text-faint:#3a3a3a;
+--red:#ff4d6a;
+--yellow:#f5c542;
+--blue:#4d9fff;
+--radius-sm:4px;
+--radius-md:8px;
+--radius-lg:12px;
+--font-ui:'Geist',system-ui,sans-serif;
+--font-mono:'Geist Mono','Fira Code',monospace;
+--transition:150ms cubic-bezier(.16,1,.3,1)
+}
+*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{
+background:var(--bg);
+color:var(--text);
+font-family:var(--font-ui);
+font-size:13px;
+height:100dvh;
+display:flex;
+flex-direction:column;
+overflow:hidden
+}
+nav{
+height:48px;
+min-height:48px;
+background:var(--surface);
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+gap:12px;
+z-index:10
+}
+.logo{
+font-size:13px;
+font-weight:600;
+letter-spacing:.08em;
+text-transform:uppercase;
+display:flex;
+align-items:center;
+gap:8px
+}
+.logo-mark{
+width:22px;
+height:22px;
+border-radius:5px;
+background:var(--accent);
+display:grid;
+place-items:center
+}
+.logo-mark svg{width:13px;height:13px}
+.logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.badge{
+font-size:10px;
+font-family:var(--font-mono);
+letter-spacing:.06em;
+padding:2px 7px;
+border-radius:20px;
+border:1px solid var(--border-hi);
+color:var(--text-muted);
+background:var(--surface-2)
+}
+button{
+cursor:pointer;
+background:none;
+border:none;
+font-family:var(--font-ui);
+font-size:12px
+}
+.btn-primary{
+background:var(--accent);
+color:#000;
+font-weight:600;
+padding:0 14px;
+height:30px;
+border-radius:var(--radius-md);
+display:inline-flex;
+align-items:center;
+gap:6px;
+letter-spacing:.02em;
+transition:opacity var(--transition),box-shadow var(--transition);
+white-space:nowrap
+}
+.btn-primary:hover{
+opacity:.88;
+box-shadow:0 0 16px var(--accent-glow)
+}
+.btn-primary:disabled{
+opacity:.35;
+cursor:not-allowed;
+box-shadow:none
+}
+.btn-ghost{
+color:var(--text-muted);
+height:30px;
+padding:0 10px;
+border-radius:var(--radius-md);
+border:1px solid var(--border);
+display:inline-flex;
+align-items:center;
+gap:6px;
+transition:color var(--transition),border-color var(--transition),background var(--transition)
+}
+.btn-ghost:hover{
+color:var(--text);
+border-color:var(--border-hi);
+background:var(--surface-2)
+}
+.btn-ghost.active{
+color:var(--accent);
+border-color:var(--accent);
+background:var(--accent-dim)
+}
+.workspace{
+display:grid;
+grid-template-columns:1fr 1fr 260px;
+flex:1;
+min-height:0
+}
+.panel{
+display:flex;
+flex-direction:column;
+min-height:0;
+overflow:hidden
+}
+.panel-header{
+height:36px;
+min-height:36px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 16px;
+border-bottom:1px solid var(--border);
+background:var(--surface)
+}
+.panel-label{
+font-size:10px;
+font-weight:600;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:var(--text-muted)
+}
+.panel-actions{display:flex;gap:4px}
+.panel-body{
+flex:1;
+overflow:auto;
+padding:12px;
+background:var(--bg);
+position:relative
+}
+#drop-zone{
+width:100%;
+height:100%;
+border:1.5px dashed var(--border-hi);
+border-radius:var(--radius-lg);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:10px;
+cursor:pointer;
+transition:border-color var(--transition),background var(--transition);
+position:relative;
+overflow:hidden
+}
+#drop-zone.drag-over{
+border-color:var(--accent);
+background:var(--accent-dim)
+}
+#drop-zone:hover{border-color:rgba(255,255,255,.2)}
+.drop-icon{
+width:40px;
+height:40px;
+border-radius:10px;
+background:var(--surface-3);
+border:1px solid var(--border-hi);
+display:grid;
+place-items:center;
+color:var(--text-muted)
+}
+.drop-icon svg{width:18px;height:18px}
+.drop-text{
+color:var(--text-muted);
+font-size:12px;
+text-align:center;
+line-height:1.6
+}
+.drop-text strong{
+color:var(--text);
+display:block;
+margin-bottom:2px
+}
+#preview-img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:contain;
+border-radius:var(--radius-lg);
+display:none;
+padding:8px
+}
+.file-info{
+position:absolute;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,.75);
+backdrop-filter:blur(6px);
+border:1px solid var(--border-hi);
+border-radius:20px;
+padding:4px 12px;
+font-size:11px;
+color:var(--text-muted);
+font-family:var(--font-mono);
+white-space:nowrap;
+display:none
+}
+.editor-wrap{
+height:100%;
+position:relative
+}
+#code-input{
+width:100%;
+height:100%;
+background:transparent;
+color:#c9d1d9;
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+padding:12px 14px;
+font-family:var(--font-mono);
+font-size:12px;
+line-height:1.7;
+resize:none;
+outline:none;
+tab-size:2;
+transition:border-color var(--transition)
+}
+#code-input:focus{border-color:var(--accent)}
+#code-input::placeholder{color:var(--text-faint)}
+.char-count{
+position:absolute;
+bottom:10px;
+right:12px;
+font-size:10px;
+font-family:var(--font-mono);
+color:var(--text-faint);
+pointer-events:none
+}
+.render-tabs{
+display:flex;
+border-bottom:1px solid var(--border);
+background:var(--surface);
+padding:0 16px;
+height:36px;
+align-items:flex-end
+}
+.tab{
+font-size:11px;
+color:var(--text-muted);
+padding:0 12px;
+height:34px;
+display:inline-flex;
+align-items:center;
+border-bottom:2px solid transparent;
+transition:color var(--transition),border-color var(--transition);
+cursor:pointer;
+letter-spacing:.02em;
+background:none;
+border-top:none;
+border-left:none;
+border-right:none
+}
+.tab.active{
+color:var(--text);
+border-bottom-color:var(--accent)
+}
+.tab:hover:not(.active){color:var(--text)}
+#live-frame{
+width:100%;
+height:100%;
+border:none;
+border-radius:var(--radius-md);
+background:#fff
+}
+.render-placeholder{
+height:100%;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:10px;
+color:var(--text-faint);
+font-size:12px
+}
+.render-placeholder svg{
+width:32px;
+height:32px;
+opacity:.3
+}
+.suggestions-list{
+display:flex;
+flex-direction:column;
+gap:8px
+}
+.suggestion-card{
+background:var(--surface-2);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+padding:10px 12px;
+transition:border-color var(--transition),background var(--transition)
+}
+.suggestion-card:hover{
+border-color:var(--border-hi);
+background:var(--surface-3)
+}
+.suggestion-tag{
+font-size:9px;
+font-weight:600;
+letter-spacing:.1em;
+text-transform:uppercase;
+padding:2px 6px;
+border-radius:3px;
+margin-bottom:6px;
+display:inline-block
+}
+.tag-style{background:rgba(77,159,255,.15);color:var(--blue)}
+.tag-perf{background:rgba(245,197,66,.15);color:var(--yellow)}
+.tag-fix{background:rgba(255,77,106,.15);color:var(--red)}
+.tag-ux{background:rgba(0,232,135,.15);color:var(--accent)}
+.suggestion-title{
+font-size:12px;
+font-weight:600;
+color:var(--text);
+margin-bottom:4px
+}
+.suggestion-body{
+font-size:11px;
+color:var(--text-muted);
+line-height:1.6
+}
+.code-snippet{
+margin-top:7px;
+background:var(--bg);
+border:1px solid var(--border);
+border-radius:var(--radius-sm);
+padding:7px 9px;
+font-family:var(--font-mono);
+font-size:10px;
+color:#7ee787;
+white-space:pre;
+overflow-x:auto
+}
+.statusbar{
+height:22px;
+min-height:22px;
+background:var(--surface);
+border-top:1px solid var(--border);
+display:flex;
+align-items:center;
+padding:0 16px;
+gap:16px;
+font-size:10px;
+font-family:var(--font-mono);
+color:var(--text-muted)
+}
+.statusbar .dot{
+width:6px;
+height:6px;
+border-radius:50%;
+background:var(--text-faint);
+display:inline-block
+}
+.statusbar .dot.ready{
+background:var(--accent);
+box-shadow:0 0 6px var(--accent-glow)
+}
+.statusbar .dot.loading{
+background:var(--yellow);
+animation:pulse 1s ease-in-out infinite
+}
+@keyframes pulse{
+0%,100%{opacity:1}
+50%{opacity:.4}
+}
+::-webkit-scrollbar{
+width:5px;
+height:5px
+}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{
+background:var(--surface-3);
+border-radius:99px
+}
+::-webkit-scrollbar-thumb:hover{
+background:var(--border-hi)
+}
+#toast{
+position:fixed;
+bottom:36px;
+left:50%;
+transform:translateX(-50%) translateY(8px);
+background:var(--surface-3);
+border:1px solid var(--border-hi);
+border-radius:var(--radius-md);
+padding:8px 16px;
+font-size:12px;
+color:var(--text);
+box-shadow:0 8px 24px rgba(0,0,0,.5);
+opacity:0;
+transition:opacity .2s,transform .2s;
+pointer-events:none;
+z-index:100;
+white-space:nowrap
+}
+#toast.show{
+opacity:1;
+transform:translateX(-50%) translateY(0)
+}
+#progress-overlay{
+display:none;
+position:absolute;
+inset:0;
+background:rgba(0,0,0,.7);
+backdrop-filter:blur(4px);
+border-radius:var(--radius-md);
+z-index:5;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:14px
+}
+#progress-overlay.show{display:flex}
+.progress-ring{
+width:36px;
+height:36px;
+border:2px solid var(--surface-3);
+border-top-color:var(--accent);
+border-radius:50%;
+animation:spin .7s linear infinite
+}
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+.progress-label{
+font-size:11px;
+color:var(--text-muted);
+font-family:var(--font-mono)
+}
+.api-row{
+display:flex;
+gap:6px;
+padding:0 20px 0 0;
+align-items:center
+}
+.api-input{
+height:30px;
+background:var(--surface-2);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+color:var(--text);
+padding:0 10px;
+font-family:var(--font-mono);
+font-size:11px;
+outline:none;
+width:220px;
+transition:border-color var(--transition)
+}
+.api-input::placeholder{color:var(--text-faint)}
+.api-input:focus{border-color:var(--accent)}
+select.model-select{
+height:30px;
+background:var(--surface-2);
+border:1px solid var(--border);
+border-radius:var(--radius-md);
+color:var(--text-muted);
+padding:0 8px;
+font-family:var(--font-ui);
+font-size:11px;
+outline:none;
+cursor:pointer
+}
+.workspace>.panel:nth-child(1),
+.workspace>.panel:nth-child(2){
+border-right:1px solid var(--border)
+}
+@media(max-width:1100px){
+.workspace{
+grid-template-columns:1fr;
+grid-template-rows:360px 1fr 280px
+}
+.workspace>.panel{
+border-right:none!important;
+border-bottom:1px solid var(--border)
+}
+nav{
+flex-wrap:wrap;
+height:auto;
+padding:12px
+}
+.api-row{
+width:100%;
+padding:0
+}
+.api-input{
+flex:1;
+width:auto
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">
+<div class="logo-mark">
+<svg viewBox="0 0 13 13" fill="none">
+<path d="M2 2L6.5 7L11 2" stroke="black" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M2 7L6.5 12L11 7" stroke="black" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+</svg>
+</div>
+VISION <span>X-TRACT</span>
+</div>
+
+<div class="api-row">
+<input class="api-input" id="api-key" type="password" placeholder="sk-..." autocomplete="off">
+<select class="model-select" id="model-select">
+<option value="gpt-4o">gpt-4o</option>
+<option value="gpt-4-turbo">gpt-4-turbo</option>
+<option value="gpt-4o-mini">gpt-4o-mini</option>
+</select>
+</div>
+
+<div class="nav-right">
+<span class="badge" id="status-badge">IDLE</span>
+
+<button class="btn-ghost" id="btn-clear">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+</svg>
+Limpiar
+</button>
+
+<button class="btn-primary" id="btn-extract">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+<circle cx="11" cy="11" r="8"/>
+<path d="m21 21-4.35-4.35"/>
+</svg>
+Analizar imagen
+</button>
+</div>
+</nav>
+
+<div class="workspace">
+
+<div class="panel">
+<div class="panel-header">
+<span class="panel-label">Referencia</span>
+<div class="panel-actions">
+<button class="btn-ghost" id="btn-paste-img">
+<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+<rect x="8" y="2" width="8" height="4" rx="1"/>
+</svg>
+Pegar
+</button>
+</div>
+</div>
+
+<div class="panel-body">
+<div id="drop-zone">
+<div class="drop-icon">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+<polyline points="17 8 12 3 7 8"/>
+<line x1="12" y1="3" x2="12" y2="15"/>
+</svg>
+</div>
+
+<div class="drop-text">
+<strong>Arrastra una imagen aquí</strong>
+PNG, JPG, WEBP, SVG — max 10 MB
+</div>
+
+<img id="preview-img" alt="">
+<span class="file-info" id="file-info"></span>
+<input type="file" id="file-input" hidden accept="image/*">
+</div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-header">
+<span class="panel-label">Código extraído</span>
+
+<div class="panel-actions">
+
+<button class="btn-ghost" id="btn-copy">
+<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<rect x="9" y="9" width="13" height="13" rx="2"/>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+</svg>
+Copiar
+</button>
+
+<button class="btn-ghost" id="btn-render">
+<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<polygon points="5 3 19 12 5 21 5 3"/>
+</svg>
+Render
+</button>
+
+</div>
+</div>
+
+<div class="panel-body">
+<div id="progress-overlay">
+<div class="progress-ring"></div>
+<span class="progress-label" id="progress-label">Analizando imagen…</span>
+</div>
+
+<div class="editor-wrap">
+<textarea id="code-input" spellcheck="false" placeholder="// El código HTML/CSS generado aparecerá aquí."></textarea>
+<span class="char-count" id="char-count">0 chars</span>
+</div>
+</div>
+</div>
+
+<div class="panel">
+
+<div class="render-tabs">
+<button class="tab active" data-tab="render">Vista previa</button>
+<button class="tab" data-tab="suggestions">Mejoras</button>
+</div>
+
+<div id="tab-render" class="panel-body" style="padding:8px;display:flex;flex-direction:column;">
+<div class="render-placeholder" id="render-placeholder">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+<rect x="2" y="3" width="20" height="14" rx="2"/>
+<path d="M8 21h8M12 17v4"/>
+</svg>
+<span>Render el código para ver la vista previa</span>
+</div>
+
+<iframe id="live-frame" style="display:none;flex:1;border-radius:6px;"></iframe>
+</div>
+
+<div id="tab-suggestions" class="panel-body" style="display:none;padding:12px;">
+<div class="suggestions-list" id="suggestions-list">
+
+<div class="suggestion-card">
+<span class="suggestion-tag tag-style">Estilo</span>
+<div class="suggestion-title">Policarbonato realista</div>
+<div class="suggestion-body">Añade textura de grano sutil con SVG feTurbulence.</div>
+<div class="code-snippet">filter:url(#grain)</div>
+</div>
+
+<div class="suggestion-card">
+<span class="suggestion-tag tag-style">Holográfico</span>
+<div class="suggestion-title">Efecto holograma</div>
+<div class="suggestion-body">Usa mix-blend-mode overlay con gradiente cónico.</div>
+<div class="code-snippet">background:conic-gradient(...)</div>
+</div>
+
+<div class="suggestion-card">
+<span class="suggestion-tag tag-perf">Perf</span>
+<div class="suggestion-title">SVG vectorial</div>
+<div class="suggestion-body">Los patrones complejos rinden mejor en SVG.</div>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="statusbar">
+<span><span class="dot" id="status-dot"></span> <span id="status-text">Sin imagen cargada</span></span>
+<span id="model-indicator">modelo: —</span>
+<span id="img-size-info"></span>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let imageBase64=null
+let imageMime=null
+let currentTab='render'
+
+const $=e=>document.querySelector(e)
+
+const dropZone=$("#drop-zone")
+const fileInput=$("#file-input")
+const previewImg=$("#preview-img")
+const fileInfo=$("#file-info")
+const codeInput=$("#code-input")
+const charCount=$("#char-count")
+const liveFrame=$("#live-frame")
+const renderHolder=$("#render-placeholder")
+const progressOverlay=$("#progress-overlay")
+const progressLabel=$("#progress-label")
+const statusDot=$("#status-dot")
+const statusText=$("#status-text")
+const statusBadge=$("#status-badge")
+const modelIndicator=$("#model-indicator")
+const imgSizeInfo=$("#img-size-info")
+const apiKeyInput=$("#api-key")
+const modelSelect=$("#model-select")
+const toast=$("#toast")
+
+let toastTimer
+
+function showToast(msg,duration=2500){
+clearTimeout(toastTimer)
+toast.textContent=msg
+toast.classList.add('show')
+toastTimer=setTimeout(()=>toast.classList.remove('show'),duration)
+}
+
+function setStatus(state,text){
+statusDot.className='dot '+(state==='ready'?'ready':state==='loading'?'loading':'')
+statusText.textContent=text
+statusBadge.textContent=state.toUpperCase()
+}
+
+function loadFile(file){
+if(!file||!file.type.startsWith('image/')){
+showToast('Archivo no válido')
+return
+}
+
+if(file.size>10*1024*1024){
+showToast('Imagen demasiado grande')
+return
+}
+
+const reader=new FileReader()
+
+reader.onload=e=>{
+const dataURL=e.target.result
+imageBase64=dataURL.split(',')[1]
+imageMime=file.type
+
+previewImg.src=dataURL
+previewImg.style.display='block'
+
+dropZone.querySelector('.drop-icon').style.display='none'
+dropZone.querySelector('.drop-text').style.display='none'
+
+fileInfo.textContent=`${file.name} · ${(file.size/1024).toFixed(0)} KB`
+fileInfo.style.display='block'
+
+imgSizeInfo.textContent=`${file.name} (${(file.size/1024).toFixed(0)} KB)`
+
+setStatus('ready','Imagen cargada')
+}
+
+reader.readAsDataURL(file)
+}
+
+dropZone.onclick=()=>fileInput.click()
+
+dropZone.addEventListener('dragover',e=>{
+e.preventDefault()
+dropZone.classList.add('drag-over')
+})
+
+dropZone.addEventListener('dragleave',()=>{
+dropZone.classList.remove('drag-over')
+})
+
+dropZone.addEventListener('drop',e=>{
+e.preventDefault()
+dropZone.classList.remove('drag-over')
+const file=e.dataTransfer.files[0]
+if(file)loadFile(file)
+})
+
+fileInput.addEventListener('change',e=>{
+loadFile(e.target.files[0])
+})
+
+$("#btn-paste-img").onclick=async()=>{
+try{
+const items=await navigator.clipboard.read()
+
+for(const item of items){
+for(const type of item.types){
+if(type.startsWith('image/')){
+const blob=await item.getType(type)
+loadFile(new File([blob],'clipboard.png',{type}))
+return
+}
+}
+}
+
+showToast('No hay imagen en el portapapeles')
+
+}catch{
+showToast('Permiso denegado')
+}
+}
+
+document.addEventListener('paste',e=>{
+const items=[...(e.clipboardData?.items||[])]
+const img=items.find(i=>i.type.startsWith('image/'))
+if(img)loadFile(img.getAsFile())
+})
+
+codeInput.addEventListener('input',()=>{
+charCount.textContent=codeInput.value.length.toLocaleString()+' chars'
+})
+
+$("#btn-extract").onclick=extractCode
+
+async function extractCode(){
+
+if(!imageBase64){
+showToast('Carga una imagen primero')
+return
+}
+
+const apiKey=apiKeyInput.value.trim()
+
+if(!apiKey){
+showToast('Introduce tu API Key')
+return
+}
+
+const model=modelSelect.value
+
+modelIndicator.textContent=`modelo: ${model}`
+
+setStatus('loading','Analizando imagen...')
+statusBadge.textContent='ANALYZING'
+
+progressOverlay.classList.add('show')
+
+const prompt=`Analiza esta imagen y genera HTML/CSS de alta fidelidad. Devuelve solo código.`
+
+try{
+
+const res=await fetch('https://api.openai.com/v1/chat/completions',{
+method:'POST',
+headers:{
+'Content-Type':'application/json',
+'Authorization':`Bearer ${apiKey}`
+},
+body:JSON.stringify({
+model,
+max_tokens:4096,
+messages:[{
+role:'user',
+content:[
+{type:'text',text:prompt},
+{
+type:'image_url',
+image_url:{
+url:`data:${imageMime};base64,${imageBase64}`,
+detail:'high'
+}
+}
+]
+}]
+})
+})
+
+if(!res.ok){
+const err=await res.json()
+throw new Error(err.error?.message||`HTTP ${res.status}`)
+}
+
+const data=await res.json()
+
+let code=data.choices?.[0]?.message?.content||''
+
+code=code.replace(/^```[\w]*\n?/m,'').replace(/\n?```$/m,'').trim()
+
+codeInput.value=code
+
+charCount.textContent=code.length.toLocaleString()+' chars'
+
+setStatus('ready',`Código extraído — ${code.length} chars`)
+statusBadge.textContent='DONE'
+
+showToast('Análisis completado')
+
+renderCode()
+
+injectDynamicSuggestions(code)
+
+}catch(err){
+
+setStatus('',`Error: ${err.message}`)
+statusBadge.textContent='ERROR'
+
+showToast(err.message,4000)
+
+}finally{
+
+progressOverlay.classList.remove('show')
+
+}
+
+}
+
+$("#btn-render").onclick=renderCode
+
+function renderCode(){
+
+const code=codeInput.value.trim()
+
+if(!code){
+showToast('No hay código')
+return
+}
+
+const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:8px;display:flex;justify-content:center;align-items:flex-start;min-height:100vh}</style></head><body>${code}</body></html>`
+
+liveFrame.srcdoc=doc
+liveFrame.style.display='block'
+renderHolder.style.display='none'
+
+switchTab('render')
+
+}
+
+$("#btn-copy").onclick=()=>{
+
+if(!codeInput.value){
+showToast('No hay código')
+return
+}
+
+navigator.clipboard.writeText(codeInput.value)
+.then(()=>showToast('Código copiado'))
+
+}
+
+$("#btn-clear").onclick=()=>{
+
+imageBase64=null
+imageMime=null
+
+previewImg.src=''
+previewImg.style.display='none'
+
+fileInfo.style.display='none'
+
+fileInput.value=''
+
+dropZone.querySelector('.drop-icon').style.display=''
+dropZone.querySelector('.drop-text').style.display=''
+
+codeInput.value=''
+
+charCount.textContent='0 chars'
+
+liveFrame.srcdoc=''
+liveFrame.style.display='none'
+
+renderHolder.style.display=''
+
+imgSizeInfo.textContent=''
+
+setStatus('','Sin imagen cargada')
+
+statusBadge.textContent='IDLE'
+
+showToast('Workspace limpiado')
+
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+tab.onclick=()=>switchTab(tab.dataset.tab)
+})
+
+function switchTab(name){
+
+currentTab=name
+
+document.querySelectorAll('.tab').forEach(t=>{
+t.classList.toggle('active',t.dataset.tab===name)
+})
+
+$("#tab-render").style.display=name==='render'?'flex':'none'
+$("#tab-suggestions").style.display=name==='suggestions'?'block':'none'
+
+}
+
+function injectDynamicSuggestions(rawCode){
+
+const list=$("#suggestions-list")
+
+list.querySelectorAll('.dynamic').forEach(el=>el.remove())
+
+const suggestions=[]
+
+if(rawCode.includes('border-radius')){
+suggestions.push({
+tag:'tag-style',
+label:'Estilo',
+title:'Añade profundidad',
+body:'Usa sombras multicapa.',
+code:'box-shadow:0 1px 2px rgba(0,0,0,.1),0 8px 24px rgba(0,0,0,.08)'
+})
+}
+
+if(!rawCode.includes('@media')){
+suggestions.push({
+tag:'tag-ux',
+label:'UX',
+title:'Responsive faltante',
+body:'Añade media queries.',
+code:'@media(max-width:768px){}'
+})
+}
+
+suggestions.forEach(s=>{
+
+const el=document.createElement('div')
+
+el.className='suggestion-card dynamic'
+
+el.innerHTML=`
+<span class="suggestion-tag ${s.tag}">${s.label}</span>
+<div class="suggestion-title">${s.title}</div>
+<div class="suggestion-body">${s.body}</div>
+<div class="code-snippet">${s.code}</div>
+`
+
+list.prepend(el)
+
+})
+
+}
+
+modelSelect.onchange=()=>{
+modelIndicator.textContent=`modelo: ${modelSelect.value}`
+}
+</script>
+
+</body>
+</html>
